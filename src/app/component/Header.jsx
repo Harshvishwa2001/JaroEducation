@@ -4,9 +4,7 @@ export default function Header() {
     return (
         <header className="sticky top-0 z-50 w-full bg-white">
             <div className="max-w-full px-20 h-20 flex items-center justify-between">
-                <h1 className="text-xl font-bold text-black tracking-tighter leading-none uppercase">
-                    Jaro Education
-                </h1>
+                <img src="/image/Jaro.png" alt="JaroEducation" className="w-45 object-cover"/>
 
                 <div className="flex items-center gap-10">
                     <div className="flex items-center gap-3 ">

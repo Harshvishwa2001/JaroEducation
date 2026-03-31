@@ -2,8 +2,9 @@
 
 import React, { useState, useEffect } from 'react'
 import Header from '../component/Header'
-import { CheckCircle2, Trophy, Clock, PlayCircle, AlertTriangle, ChevronRight } from 'lucide-react'
+import { CheckCircle2, Trophy, Clock, PlayCircle, AlertTriangle, ChevronRight, AlertCircle } from 'lucide-react'
 import { useRouter } from 'next/navigation';
+import toast from 'react-hot-toast';
 
 export default function ExamPage() {
   const [step, setStep] = useState('loading');
@@ -12,9 +13,31 @@ export default function ExamPage() {
   const [timeLeft, setTimeLeft] = useState({
     days: 3,
     hours: 23,
-    minutes: 59,
+    minutes: 2,
     seconds: 59
   });
+
+  const totalSeconds = (timeLeft.minutes * 60) + timeLeft.seconds;
+  const isUrgent = totalSeconds <= 120;
+  const [hasWarned, setHasWarned] = useState(false);
+
+  useEffect(() => {
+    if (timeLeft.minutes === 2 && timeLeft.seconds === 0 && !hasWarned) {
+      toast.error("Hurry! Only 2 minutes remaining to complete your assessment.", {
+        duration: 5000,
+        position: 'top-center',
+        style: {
+          background: '#901824',
+          color: '#fff',
+          fontWeight: 'bold',
+          borderRadius: '15px',
+          border: '1px solid #ff4b5c'
+        },
+        icon: '⚠️',
+      });
+      setHasWarned(true);
+    }
+  }, [timeLeft.minutes, timeLeft.seconds]);
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -54,6 +77,24 @@ export default function ExamPage() {
     }
   }, []);
 
+  // Add this state at the top of your component
+  const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
+
+  // Sample dynamic questions (usually fetched from your API)
+  const questions = [
+    { id: 1, text: "Which document is essential for the Grant verification process?" },
+    { id: 2, text: "What is the maximum duration to claim the scholarship voucher?" },
+    { id: 3, text: "Which tier offers the highest career acceleration support?" }
+  ];
+
+  const handleNext = () => {
+    if (currentQuestionIndex < questions.length - 1) {
+      setCurrentQuestionIndex(currentQuestionIndex + 1);
+    } else {
+      setStep('result');
+    }
+  };
+
   if (step === 'loading') {
     return (
       <div className="min-h-screen bg-[#151941] flex items-center justify-center">
@@ -62,67 +103,170 @@ export default function ExamPage() {
     );
   }
 
+  {
+    isUrgent && (
+      <div className="fixed top-10 left-1/2 -translate-x-1/2 z-[100] animate-in slide-in-from-top-10 duration-500">
+        <div className="bg-[#901824] border-2 border-red-500 text-white px-8 py-4 rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.3)] flex items-center gap-4">
+          <div className="bg-white/20 p-2 rounded-full animate-pulse">
+            <AlertCircle className="w-6 h-6 text-white" />
+          </div>
+          <div>
+            <p className="font-medium uppercase tracking-widest text-xs">Urgent Warning</p>
+            <p className="text-sm font-medium opacity-90">Assessment ends in less than 2 minutes!</p>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
   return (
     <div className='bg-linear-to-b from-[#474f83] to-[#151941] min-h-screen text-white pb-20'>
+      {/* <Header /> */}
       <div className="container max-w-4xl mx-auto py-12 px-6">
 
         {/* --- SECTION 1: CANDIDATE INFO --- */}
         {step === 'info' && (
-          <div className="animate-in fade-in zoom-in-95 duration-500 bg-white rounded-[40px] p-8 md:p-14 shadow-2xl text-slate-800 border border-white/20">
-            <div className="text-center mb-10">
-              <h3 className="text-4xl font-black text-[#151941] uppercase italic tracking-wide leading-none">
-                Welcome, {candidate?.name || 'Candidate'}!
-              </h3>
-              <p className="text-slate-400 font-bold mt-4 text-xs uppercase tracking-[0.3em]">Verify your profile details</p>
+          <div>
+            <div className='flex items-center justify-between -mt-12'>
+              <div className='flex'>
+                <div className="mt-2 rounded-lg">
+                  <img src="/image/SEO 2.gif" alt="Rocket Icon" className='w-40 h-40 object-cover' />
+                </div>
+
+                <div>
+                  <h1 className="text-3xl md:text-5xl font-black leading-[0.6] tracking-wide bg-linear-to-b from-[#ffffff]  to-[#6d79c5] bg-clip-text text-transparent mt-16">
+                    Udaan <br />
+                    <span className='text-2xl md:text-3xl'>Kamyabi ki</span>
+                  </h1>
+                </div>
+              </div>
+              <div className='pr-10'>
+                <img src="/image/lottery.png" alt="lottery" className='w-60 mt-10' />
+              </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-10">
-              <InfoBox label="Registered Email" value={candidate?.email || 'Not Provided'} />
-              <InfoBox label="Contact Number" value={candidate?.mobile || 'Not Provided'} />
-              <InfoBox label="Specialization" value={`${candidate?.course || 'BCA'} - ${candidate?.uni || 'University'}`} />
-              <InfoBox label="Scholarship Level" value={candidate?.level || 'MBA'} highlight />
-            </div>
+            <div className="animate-in fade-in zoom-in-95 duration-500 bg-white rounded-[40px] p-8 md:p-14 shadow-2xl text-slate-800 border border-white/20">
+              <div className="text-center mb-10">
+                <h3 className="text-4xl font-black text-[#151941] uppercase italic tracking-wide leading-none">
+                  Welcome, {candidate?.name || 'Candidate'}!
+                </h3>
+                <p className="text-slate-400 font-bold mt-4 text-xs uppercase tracking-[0.3em]">Verify your profile details</p>
+              </div>
 
-            <div className="text-center pt-4">
-              <button
-                onClick={() => setStep('quiz')}
-                className="group w-full md:w-auto px-16 h-16 bg-gradient-to-r from-indigo-600 to-[#151941] hover:scale-[1.02] text-white rounded-2xl font-black uppercase tracking-[0.2em] shadow-2xl transition-all flex items-center justify-center gap-4 mx-auto active:scale-95"
-              >
-                Start Assessment <PlayCircle className="w-5 h-5" />
-              </button>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-10">
+                <InfoBox label="Registered Email" value={candidate?.email || 'Testing@gmail.com'} />
+                <InfoBox label="Contact Number" value={candidate?.mobile || '1234567890'} />
+                <InfoBox label="University" value={`${candidate?.course || 'BCA'} - ${candidate?.uni || 'University'}`} />
+                <InfoBox label="Course:" value={candidate?.level || 'MBA'} highlight />
+              </div>
+
+              <div className="text-center pt-4">
+                <button
+                  onClick={() => setStep('quiz')}
+                  className="group w-full md:w-auto px-16 h-16 bg-linear-to-r from-[#f3d57a] to-[#face49] text-black hover:scale-[1.02] rounded-2xl font-bold tracking-[0.2em] shadow-2xl transition-all flex items-center justify-center gap-4 mx-auto active:scale-95"
+                >
+                  Start Assessment
+                </button>
+              </div>
             </div>
           </div>
         )}
 
         {/* --- SECTION 2: QUIZ ASSESSMENT --- */}
         {step === 'quiz' && (
-          <div className="animate-in slide-in-from-bottom-12 duration-700 bg-white rounded-[40px] p-8 md:p-14 shadow-2xl text-slate-800">
-            <div className="flex justify-between items-center mb-10 border-b pb-6 border-slate-100">
-              <div className="flex items-center gap-3">
-                <div className="p-3 bg-indigo-50 rounded-xl">
-                  <Clock className="w-6 h-6 text-indigo-600" />
+          <div>
+            <div className='flex items-center justify-between'>
+              <h1 className="text-3xl md:text-5xl font-black leading-[0.6] tracking-wide bg-linear-to-b from-[#ffffff]  to-[#6d79c5] bg-clip-text text-transparent px-10 py-4">
+                Udaan <br />
+                <span className='text-2xl md:text-3xl'>Kamyabi ki</span>
+              </h1>
+              <div className="flex items-center gap-3 pr-10">
+                <span className={`text-[12px] font-black uppercase tracking-widest transition-colors duration-500 ${isUrgent ? 'text-red-500 animate-pulse' : 'text-white/80'}`}>
+                  {isUrgent ? 'Hurry! Time Left :' : 'Time Left :'}
+                </span>
+
+                <div className={`flex items-center gap-3 px-5 py-2 rounded-2xl border backdrop-blur-md transition-all duration-500 ${isUrgent
+                  ? 'bg-red-500/10 border-red-500/50 shadow-[0_0_15px_rgba(239,68,68,0.2)]'
+                  : 'bg-white/10 border-white/10'
+                  }`}>
+
+                  <TimerSegment
+                    value={String(timeLeft.minutes).padStart(2, '0')}
+                    label="min"
+                    isUrgent={isUrgent}
+                  />
+
+                  <span className={`text-xl font-bold mb-4 transition-colors ${isUrgent ? 'text-red-500' : 'text-white'}`}>:</span>
+
+                  <TimerSegment
+                    value={String(timeLeft.seconds).padStart(2, '0')}
+                    label="sec"
+                    isUrgent={isUrgent}
+                  />
                 </div>
-                <h3 className="text-2xl font-black text-[#151941] uppercase tracking-tighter">Live Assessment</h3>
-              </div>
-              <div className="text-right">
-                <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Target Level</p>
-                <p className="text-sm font-bold text-indigo-600">{candidate?.level || 'N/A'}</p>
               </div>
             </div>
 
-            <div className="space-y-12">
-              <QuestionBlock number={1} question="Which document is essential for the Grant verification process?" />
-              <QuestionBlock number={2} question="What is the maximum duration to claim the scholarship voucher?" />
+            <div className="animate-in slide-in-from-bottom-12 duration-700 bg-white rounded-[40px] p-8 md:p-10 shadow-2xl text-slate-800">
+
+              {/* Header with Progress Bar */}
+              <div className="flex justify-between items-center mb-6">
+                <div className="flex items-center gap-3">
+                  <div className="p-3 bg-indigo-50 rounded-xl">
+                    <Clock className="w-6 h-6 text-indigo-600" />
+                  </div>
+                  <div className="space-y-1">
+                    <h3 className="text-lg md:text-xl font-bold text-[#151941] leading-tight">
+                      Complete to unlock your personalized career grant
+                    </h3>
+                    <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">Assessment in progress</p>
+                  </div>
+                </div>
+                <div className="text-right">
+                  <p className="text-xl font-black text-indigo-600">{currentQuestionIndex + 1} <span className="text-slate-300 text-sm">/ {questions.length}</span></p>
+                </div>
+              </div>
+
+              {/* Dynamic Progress Line */}
+              <div className="w-full h-1.5 bg-slate-100 rounded-full mb-10 overflow-hidden">
+                <div
+                  className="h-full bg-linear-to-r from-[#f3d57a] to-[#face49] transition-all duration-500 ease-out"
+                  style={{ width: `${((currentQuestionIndex + 1) / questions.length) * 100}%` }}
+                />
+              </div>
+
+              {/* Display only ONE question based on the index */}
+              <div className="min-h-35 animate-in fade-in slide-in-from-right-8 duration-500" key={currentQuestionIndex}>
+                <QuestionBlock
+                  number={currentQuestionIndex + 1}
+                  question={questions[currentQuestionIndex].text}
+                />
+              </div>
+
+              {/* Navigation Footer */}
+              <div className="mt-16 pt-8 border-t border-slate-100 flex justify-between items-center">
+                <button
+                  disabled={currentQuestionIndex === 0}
+                  onClick={() => setCurrentQuestionIndex(currentQuestionIndex - 1)}
+                  className={`text-sm font-bold uppercase tracking-widest ${currentQuestionIndex === 0 ? 'text-slate-300 cursor-not-allowed' : 'text-slate-500 hover:text-indigo-600'}`}
+                >
+                  Previous
+                </button>
+
+                <button
+                  onClick={handleNext}
+                  className="w-full md:w-auto px-12 h-14 bg-linear-to-r from-[#f3d57a] to-[#face49] text-black  hover:bg-[#f6de97] rounded-xl font-bold tracking-widest shadow-xl transition-all flex items-center justify-center gap-3 active:scale-95"
+                >
+                  {currentQuestionIndex === questions.length - 1 ? 'Submit' : 'Next'}
+
+                </button>
+              </div>
+            <div className='mt-4 space-y-2'>
+              <p>🔒 Your responses are secure & used only for grant evaluation.</p>
+              <p>💰 Grant will be revealed immediately after completion.</p>
+            </div>
             </div>
 
-            <div className="mt-16 pt-8 border-t border-slate-100 flex justify-center md:justify-end">
-              <button
-                onClick={() => setStep('result')}
-                className="w-full md:w-auto px-12 h-14 bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl font-black uppercase tracking-widest shadow-xl transition-all flex items-center justify-center gap-3"
-              >
-                Submit My Answers <CheckCircle2 className="w-5 h-5" />
-              </button>
-            </div>
           </div>
         )}
 
@@ -193,7 +337,7 @@ export default function ExamPage() {
                   </div>
 
                   {/* Decorative Shine Effect */}
-                  <div className="absolute top-0 -inset-full h-full w-1/2 z-30 block transform -skew-x-12 bg-gradient-to-r from-transparent via-white/30 to-transparent group-hover:animate-shine" />
+                  <div className="absolute top-0 -inset-full h-full w-1/2 z-30 block transform -skew-x-12 bg-linear-to-r from-transparent via-white/30 to-transparent group-hover:animate-shine" />
                 </div>
               </div>
             </div>
@@ -225,12 +369,22 @@ export default function ExamPage() {
             </div>
           </div>
         )}
-
-
-
       </div>
     </div>
   )
+}
+
+function TimerSegment({ value, label, isUrgent }) {
+  return (
+    <div className="flex flex-col items-center min-w-8">
+      <span className={`text-2xl font-mono font-black tabular-nums transition-colors ${isUrgent ? 'text-red-500' : 'text-white'}`}>
+        {value}
+      </span>
+      <span className={`text-[8px] font-bold uppercase tracking-widest ${isUrgent ? 'text-red-400' : 'text-indigo-200'}`}>
+        {label}
+      </span>
+    </div>
+  );
 }
 
 function TimerBlock({ value, label }) {

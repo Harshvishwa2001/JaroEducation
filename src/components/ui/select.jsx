@@ -85,7 +85,7 @@ function SelectItem({ className, children, ...props }) {
 function SelectLabel({ className, ...props }) {
   return (
     <SelectPrimitive.Label
-      className={cn("px-4 py-2 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]", className)}
+      className={cn("px-4 py-2 text-[10px]  text-slate-400 uppercase tracking-[0.2em]", className)}
       {...props} />
   );
 }
