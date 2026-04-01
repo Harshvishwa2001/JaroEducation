@@ -78,45 +78,6 @@ export default function ExamPage({ candidates, saleId }) {
     }
   }, [timeLeft.minutes, timeLeft.seconds, hasWarned]);
 
-  useEffect(() => {
-    const verifyCandidate = async () => {
-      const urlParams = new URLSearchParams(window.location.search);
-      let emailEncoded = urlParams.get('email');
-
-      if (!emailEncoded) {
-        showError("Invalid Link", "No email provided in the URL.");
-        return;
-      }
-
-      try {
-        const email = atob(emailEncoded);
-        const response = await fetch(`${API_BASE_URL}/candidates?email=${encodeURIComponent(email)}`);
-        console.log("Email id", response)
-        const result = await response.json();
-
-        if (response.ok && result.data) {
-          if (parseInt(result.data.submitted_at) === 1) {
-            showError("Exam Already Completed", "You have already submitted this assessment.");
-            return;
-          }
-          setCandidate(result.data);
-          setStep(2); // Show Info Section
-        } else {
-          showError("Candidate Not Found", "We couldn't find an assessment for this email.");
-        }
-      } catch (err) {
-        showError("Error", "Failed to verify link or connect to server.");
-      }
-    };
-
-    verifyCandidate();
-  }, []);
-
-  const showError = (title, msg) => {
-    setErrorDetails({ title, msg });
-    setStep(1);
-  };
-
   // --- INITIAL DATA LOAD ---
   useEffect(() => {
     const savedData = localStorage.getItem('candidate_info');
