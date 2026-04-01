@@ -1,4 +1,4 @@
-import { HelpCircleIcon, Phone, PhoneCall, PhoneCallIcon } from "lucide-react";
+import { HelpCircleIcon, Phone } from "lucide-react";
 
 export default function Header() {
     return (
@@ -13,15 +13,6 @@ export default function Header() {
                         </div>
                         <span className="text-xs font-bold uppercase tracking-widest text-slate-900 ">
                             Help
-                        </span>
-                    </div>
-
-                    <div className="flex items-center gap-3 ">
-                        <div className="h-8 w-8 rounded-3xl bg-linear-to-br from-[#2c3363] to-[#191d49] flex items-center justify-center text-white">
-                            <Phone size={18} strokeWidth={2} />
-                        </div>
-                        <span className="text-xs font-bold uppercase tracking-widest text-slate-900">
-                            Contact us
                         </span>
                     </div>
                 </div>

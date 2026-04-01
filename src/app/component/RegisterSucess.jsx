@@ -1,17 +1,13 @@
 'use client'
-import React from 'react'
-import Header from './Header'
-import { CheckCircle2, ArrowRight, UserCheck } from 'lucide-react'
+import { CheckCircle2 } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 
-export default function RegisterSuccess() {
+export default function RegisterSuccess({ candidate }) {
     const router = useRouter();
 
     return (
         <div className='bg-linear-to-b from-[#474f83] to-[#151941] min-h-screen'>
-            <Header />
-
-            <div className='flex-1 flex items-center justify-center p-6 mt-20'>
+            <div className='flex-1 flex items-center justify-center p-6 py-20'>
                 <div className='bg-[#e3e5f5] backdrop-blur-xl max-w-3xl w-full rounded-[40px] shadow-[0_32px_64px_-15px_rgba(0,0,0,0.4)] overflow-hidden border border-white/20'>
                     <div className='p-10 md:p-14 text-center space-y-8'>
 
@@ -29,7 +25,7 @@ export default function RegisterSuccess() {
                                 Registration Successful
                             </h2>
                             <p className='text-slate-500 text-lg font-medium px-4'>
-                                Scholarship program link shared to Rahul Patil on mail and SMS
+                                Scholarship program link shared to <span className="text-[#474f83] font-bold">{candidate || 'the candidate'}</span> on mail and SMS
                             </p>
                         </div>
 

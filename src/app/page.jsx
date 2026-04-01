@@ -1,9 +1,10 @@
 'use client'
-import React, { useEffect, useState } from 'react'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { useState } from 'react';
 import toast from 'react-hot-toast';
 import Header from './component/Header';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import RegisterSucess from './component/RegisterSucess';
+import ExamPage from './exam/page';
 
 export default function Home() {
   const [email, setEmail] = useState('');
@@ -11,6 +12,7 @@ export default function Home() {
   const [salesData, setSalesData] = useState(null);
   const [levelCategory, setLevelCategory] = useState(''); // Added for Shadcn Select
   const [isLoading, setIsLoading] = useState(false);
+  const [candidateData, setCandidateData] = useState(null); // Store all data for the exam
 
   const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
@@ -28,7 +30,7 @@ export default function Home() {
     const loadingToast = toast.loading('Verifying Sales ID...');
 
     try {
-      const response = await fetch(`${API_BASE_URL}sales?search=${encodeURIComponent(emailStr)}`);
+      const response = await fetch(`${API_BASE_URL}/sales?search=${encodeURIComponent(emailStr)}`);
       const result = await response.json();
 
       if (response.ok && result.data && result.data.length > 0) {
@@ -57,7 +59,7 @@ export default function Home() {
     const payload = {
       sales_id: salesData?.id || 1,
       name: formData.get('name'),
-      email: email,
+      email: formData.get('email'),
       mobile: formData.get('mobile'),
       level: levelCategory,
       university: formData.get('university'),
@@ -66,17 +68,18 @@ export default function Home() {
       date_completion: formData.get('date_completion')
     };
 
+    setCandidateData(payload); // Save data for Step 4
     const loadingToast = toast.loading('Registering Candidate...');
 
     try {
-      const response = await fetch(`${API_BASE_URL}candidates`, {
+      const response = await fetch(`${API_BASE_URL}/candidates`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)
       });
 
       const result = await response.json();
-
+      localStorage.setItem('candidate_info', JSON.stringify(result.email || payload));
       if (response.ok || response.status === 201) {
         toast.success('Registration Successful! Exam link sent to candidate.', { id: loadingToast });
         setStep(3); // Auto-navigate to Success
@@ -94,6 +97,8 @@ export default function Home() {
       setIsLoading(false);
     }
   };
+
+  console.log("salesData", salesData?.id)
 
   return (
     <div className=''>
@@ -151,7 +156,6 @@ export default function Home() {
       {/* Step 2: Registration */}
       {step === 2 && (
         <div className='bg-linear-to-b from-[#474f83] to-[#151941] min-h-screen'>
-          <Header />
           <div className='py-20'>
             <section className="bg-[#e3e5f5] backdrop-blur-2xl w-full max-w-6xl mx-auto rounded-[40px] shadow-[0_32px_64px_-15px_rgba(0,0,0,0.2)] border border-white/20 overflow-hidden group transition-all">
               <div className="p-8 md:p-12 ">
@@ -175,7 +179,7 @@ export default function Home() {
                     </div>
                     <div className="space-y-2">
                       <label className="text-[11px] font-black text-slate-400 uppercase tracking-widest ml-1">Email Address</label>
-                      <input name="email" type="email" value={email} readOnly className="w-full h-14 px-6 bg-slate-200 border border-slate-100 rounded-2xl text-sm font-semibold text-slate-500 cursor-not-allowed" required />
+                      <input name="email" type="email" className="w-full h-14 px-6 bg-slate-50/50 border border-slate-100 rounded-2xl text-sm font-semibold text-black focus:ring-4 focus:ring-indigo-500/10 focus:border-[#474f83] outline-none transition-all" required />
                     </div>
                     <div className="space-y-2">
                       <label className="text-[11px] font-black text-slate-400 uppercase tracking-widest ml-1">Mobile Number</label>
@@ -225,7 +229,12 @@ export default function Home() {
       )}
 
       {/* Step 3: Success */}
-      {step === 3 && <RegisterSucess  />}
+      {step === 3 && <RegisterSucess candidate={candidateData?.name} onStartExam={() => setStep(4)} />}
+
+      {
+        console.log("Data:", salesData?.id)
+      }
+      {step === 4 && <ExamPage candidates={candidateData} saleId={salesData?.id}/>}
     </div>
   )
 }
