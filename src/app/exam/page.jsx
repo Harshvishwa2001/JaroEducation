@@ -24,16 +24,12 @@ export default function ExamPage({ candidates, saleId }) {
     seconds: 59
   });
 
-  console.log("Current Candidate State:", candidate);
   const totalSeconds = (timeLeft.minutes * 60) + timeLeft.seconds;
   const isUrgent = totalSeconds <= 120 && timeLeft.days === 0 && timeLeft.hours === 0;
 
   // --- TIMER LOGIC ---
   useEffect(() => {
     const savedData = localStorage.getItem('candidate_info');
-    console.log("Found in localStorage:", savedData);
-    console.log("Found in Props:", candidates);
-
     if (savedData) {
       setCandidate(JSON.parse(savedData));
     } else if (candidates) {
@@ -78,26 +74,13 @@ export default function ExamPage({ candidates, saleId }) {
     }
   }, [timeLeft.minutes, timeLeft.seconds, hasWarned]);
 
-  // --- INITIAL DATA LOAD ---
-  useEffect(() => {
-    const savedData = localStorage.getItem('candidate_info');
-    if (savedData) {
-      setCandidate(JSON.parse(savedData));
-    } else if (candidates) {
-      setCandidate(candidates);
-    }
-    setStep('info');
-  }, [candidates]);
-
   // --- HANDLERS ---
   const handleOptionChange = (questionId, optionValue) => {
     setSelectedAnswers(prev => ({ ...prev, [questionId]: optionValue }));
   };
 
   const handleStartExam = async () => {
-    // FIX: Changed candidateId to candidate to fix the ReferenceError
     if (!candidate) {
-      console.error("Missing Candidate Data");
       toast.error("Profile data not found. Please try again.");
       return;
     }
@@ -161,7 +144,6 @@ export default function ExamPage({ candidates, saleId }) {
       )}
 
       <div className="container max-w-4xl mx-auto py-12 px-6">
-        {/* --- SECTION 1: CANDIDATE INFO --- */}
         {step === 'info' && (
           <div>
             <div className='flex items-center justify-between -mt-12'>
@@ -209,7 +191,6 @@ export default function ExamPage({ candidates, saleId }) {
           </div>
         )}
 
-        {/* --- SECTION 2: QUIZ ASSESSMENT --- */}
         {step === 'quiz' && (
           <div>
             <div className='flex items-center justify-between'>
@@ -253,7 +234,7 @@ export default function ExamPage({ candidates, saleId }) {
                 <QuestionBlock
                   number={currentQuestionIndex + 1}
                   questionData={questions[currentQuestionIndex]}
-                  selectedOption={selectedAnswers[questions[currentQuestionIndex].id]}
+                  selectedOption={selectedAnswers[questions[currentQuestionIndex]?.id]}
                   onSelect={(val) => handleOptionChange(questions[currentQuestionIndex].id, val)}
                 />
               </div>
@@ -277,7 +258,6 @@ export default function ExamPage({ candidates, saleId }) {
           </div>
         )}
 
-        {/* --- SECTION 3: RESULT --- */}
         {step === 'result' && (
           <div className="animate-in zoom-in-95 duration-500 bg-[#e4e6f5] backdrop-blur-xl border border-white/10 rounded-[50px] p-12 text-center shadow-2xl">
             <h2 className="text-2xl font-bold text-black tracking-wider mb-4">🎊Congratulations, {candidate?.name || 'Rahul Patil'}!🎊</h2>
@@ -366,7 +346,9 @@ function InfoBox({ label, value, highlight }) {
 
 function QuestionBlock({ number, questionData, selectedOption, onSelect }) {
   if (!questionData) return null;
-  const options = questionData.options || [questionData.option_a, questionData.option_b, questionData.option_c, questionData.option_d].filter(Boolean);
+  
+  // FIXED: Access the options correctly whether they are strings or objects
+  const options = questionData.options || [];
 
   return (
     <div className="space-y-6">
@@ -375,12 +357,25 @@ function QuestionBlock({ number, questionData, selectedOption, onSelect }) {
         {questionData.text || questionData.question}
       </h4>
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 ml-0 md:ml-12">
-        {options.map((opt, i) => (
-          <label key={i} className={`flex items-center gap-4 p-5 border rounded-2xl cursor-pointer transition-all group ${selectedOption === opt ? 'border-indigo-600 bg-indigo-50' : 'border-slate-100 hover:border-indigo-400 hover:bg-indigo-50/50'}`}>
-            <input type="radio" name={`q-${questionData.id}`} checked={selectedOption === opt} onChange={() => onSelect(opt)} className="accent-indigo-600 w-5 h-5" />
-            <span className="text-sm font-bold text-slate-600 group-hover:text-[#151941]">{opt}</span>
-          </label>
-        ))}
+        {options.map((opt, i) => {
+          // Logic to handle if 'opt' is an object {id, option_text} or a simple string
+          const displayValue = typeof opt === 'object' ? opt.option_text : opt;
+          
+          return (
+            <label key={i} className={`flex items-center gap-4 p-5 border rounded-2xl cursor-pointer transition-all group ${selectedOption === displayValue ? 'border-indigo-600 bg-indigo-50' : 'border-slate-100 hover:border-indigo-400 hover:bg-indigo-50/50'}`}>
+              <input 
+                type="radio" 
+                name={`q-${questionData.id}`} 
+                checked={selectedOption === displayValue} 
+                onChange={() => onSelect(displayValue)} 
+                className="accent-indigo-600 w-5 h-5" 
+              />
+              <span className="text-sm font-bold text-slate-600 group-hover:text-[#151941]">
+                {displayValue}
+              </span>
+            </label>
+          )
+        })}
       </div>
     </div>
   );
