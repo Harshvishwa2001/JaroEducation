@@ -179,7 +179,7 @@ export default function Home() {
                     </div>
                     <div className="space-y-2">
                       <label className="text-[11px] font-black text-slate-400 uppercase tracking-widest ml-1">Email Address</label>
-                      <input name="email" type="email" className="w-full h-14 px-6 bg-slate-50/50 border border-slate-100 rounded-2xl text-sm font-semibold text-black focus:ring-4 focus:ring-indigo-500/10 focus:border-[#474f83] outline-none transition-all" required />
+                      <input name="email" type="email" className="w-full h-14 px-6 bg-slate-50/50 border border-slate-100 rounded-2xl text-sm font-semibold text-black focus:ring-4 focus:ring-indigo-500/10 focus:border-[#474f83] outline-none transition-all" placeholder="admin@gmail.com" required />
                     </div>
                     <div className="space-y-2">
                       <label className="text-[11px] font-black text-slate-400 uppercase tracking-widest ml-1">Mobile Number</label>
