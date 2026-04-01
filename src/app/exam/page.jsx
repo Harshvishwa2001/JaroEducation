@@ -1,13 +1,15 @@
 "use client"
 
 import { AlertCircle, Clock, AlertTriangle } from 'lucide-react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation'; // Added useSearchParams
 import { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 
 export default function ExamPage({ candidates, saleId }) {
   const router = useRouter();
+  const searchParams = useSearchParams(); // Hook to read URL params
   const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || '/api';
+  
   // --- STATE MANAGEMENT ---
   const [step, setStep] = useState('loading');
   const [candidate, setCandidate] = useState(null);
@@ -16,28 +18,61 @@ export default function ExamPage({ candidates, saleId }) {
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [selectedAnswers, setSelectedAnswers] = useState({});
   const [hasWarned, setHasWarned] = useState(false);
-  const [errorDetails, setErrorDetails] = useState({ title: '', msg: '' });
   const [timeLeft, setTimeLeft] = useState({
-    days: 3,
-    hours: 23,
-    minutes: 2,
-    seconds: 59
+    days: 3, hours: 23, minutes: 2, seconds: 59
   });
 
   const totalSeconds = (timeLeft.minutes * 60) + timeLeft.seconds;
   const isUrgent = totalSeconds <= 120 && timeLeft.days === 0 && timeLeft.hours === 0;
 
-  // --- TIMER LOGIC ---
+  // --- NEW: AUTOMATIC DATA FETCHING LOGIC ---
   useEffect(() => {
-    const savedData = localStorage.getItem('candidate_info');
-    if (savedData) {
-      setCandidate(JSON.parse(savedData));
-    } else if (candidates) {
-      setCandidate(candidates);
-    }
-    setStep('info');
-  }, [candidates]);
+    const autoLoadCandidate = async () => {
+      const emailParam = searchParams.get('email');
 
+      if (emailParam) {
+        try {
+          // 1. Decrypt email from URL
+          const decodedEmail = atob(emailParam);
+          
+          // 2. Fetch from Database automatically
+          const response = await fetch(`${API_BASE_URL}/candidates?email=${encodeURIComponent(decodedEmail)}`);
+          const result = await response.json();
+
+          if (response.ok && result.data) {
+            // Check if already submitted
+            if (parseInt(result.data.submitted_at) === 1) {
+              toast.error("Exam already completed.");
+              router.push('/'); // Redirect away if done
+              return;
+            }
+            
+            setCandidate(result.data);
+            setStep('info'); // Automatically go to info section with filled data
+          } else {
+            toast.error("Candidate not found.");
+            setStep('info'); // Fallback to empty info if not found
+          }
+        } catch (e) {
+          console.error("Link decryption error", e);
+          setStep('info');
+        }
+      } else {
+        // Fallback to your existing props/localStorage logic if no email in URL
+        const savedData = localStorage.getItem('candidate_info');
+        if (savedData) {
+          setCandidate(JSON.parse(savedData));
+        } else if (candidates) {
+          setCandidate(candidates);
+        }
+        setStep('info');
+      }
+    };
+
+    autoLoadCandidate();
+  }, [searchParams, candidates, router, API_BASE_URL]);
+
+  // --- TIMER LOGIC ---
   useEffect(() => {
     const timer = setInterval(() => {
       setTimeLeft(prev => {
@@ -92,8 +127,8 @@ export default function ExamPage({ candidates, saleId }) {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          candidate_id: candidate?.sales_id || candidate?.id || "saleId",
-          level: candidate.level || 'General'
+          candidate_id: candidate?.id || candidate?.sales_id,
+          level: candidate.level || candidate.course_name || 'General'
         })
       });
 
@@ -111,14 +146,16 @@ export default function ExamPage({ candidates, saleId }) {
     }
   };
 
-  const handleNext = () => {
+  const handleNext = async () => {
     if (currentQuestionIndex < questions.length - 1) {
       setCurrentQuestionIndex(currentQuestionIndex + 1);
     } else {
-      setStep('result');
+        // Handle Final Submission Logic Here
+        setStep('result');
     }
   };
 
+  // --- LOADING RENDER ---
   if (step === 'loading') {
     return (
       <div className="min-h-screen bg-[#151941] flex items-center justify-center">
@@ -127,6 +164,7 @@ export default function ExamPage({ candidates, saleId }) {
     );
   }
 
+  // --- MAIN UI RENDER (UNCHANGED DESIGN) ---
   return (
     <div className='bg-linear-to-b from-[#474f83] to-[#151941] min-h-screen text-white pb-20'>
       {isUrgent && step === 'quiz' && (
@@ -172,10 +210,10 @@ export default function ExamPage({ candidates, saleId }) {
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-10">
-                <InfoBox label="Registered Email" value={candidate?.email || 'Testing@gmail.com'} />
-                <InfoBox label="Contact Number" value={candidate?.mobile || '1234567890'} />
-                <InfoBox label="University" value={`${candidate?.course || 'BCA'} - ${candidate?.uni || 'University'}`} />
-                <InfoBox label="Course:" value={candidate?.level || 'MBA'} highlight />
+                <InfoBox label="Registered Email" value={candidate?.email || '...'} />
+                <InfoBox label="Contact Number" value={candidate?.mobile || '...'} />
+                <InfoBox label="University" value={`${candidate?.course_name || '...'} - ${candidate?.university || '...'}`} />
+                <InfoBox label="Course Level:" value={candidate?.level || candidate?.course_name || 'MBA'} highlight />
               </div>
 
               <div className="text-center pt-4">
@@ -260,7 +298,7 @@ export default function ExamPage({ candidates, saleId }) {
 
         {step === 'result' && (
           <div className="animate-in zoom-in-95 duration-500 bg-[#e4e6f5] backdrop-blur-xl border border-white/10 rounded-[50px] p-12 text-center shadow-2xl">
-            <h2 className="text-2xl font-bold text-black tracking-wider mb-4">🎊Congratulations, {candidate?.name || 'Rahul Patil'}!🎊</h2>
+            <h2 className="text-2xl font-bold text-black tracking-wider mb-4">🎊Congratulations, {candidate?.name}!🎊</h2>
             <div>
               <h1 className='p-5 text-slate-800 text-xl font-medium'>Your Evaluation Score</h1>
               <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-12">
@@ -316,7 +354,7 @@ export default function ExamPage({ candidates, saleId }) {
   )
 }
 
-// --- HELPER COMPONENTS ---
+// --- HELPER COMPONENTS (NO CHANGES) ---
 function TimerSegment({ value, label, isUrgent }) {
   return (
     <div className="flex flex-col items-center min-w-8">
@@ -346,8 +384,6 @@ function InfoBox({ label, value, highlight }) {
 
 function QuestionBlock({ number, questionData, selectedOption, onSelect }) {
   if (!questionData) return null;
-  
-  // FIXED: Access the options correctly whether they are strings or objects
   const options = questionData.options || [];
 
   return (
@@ -358,9 +394,7 @@ function QuestionBlock({ number, questionData, selectedOption, onSelect }) {
       </h4>
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 ml-0 md:ml-12">
         {options.map((opt, i) => {
-          // Logic to handle if 'opt' is an object {id, option_text} or a simple string
           const displayValue = typeof opt === 'object' ? opt.option_text : opt;
-          
           return (
             <label key={i} className={`flex items-center gap-4 p-5 border rounded-2xl cursor-pointer transition-all group ${selectedOption === displayValue ? 'border-indigo-600 bg-indigo-50' : 'border-slate-100 hover:border-indigo-400 hover:bg-indigo-50/50'}`}>
               <input 

@@ -230,10 +230,6 @@ export default function Home() {
 
       {/* Step 3: Success */}
       {step === 3 && <RegisterSucess candidate={candidateData?.name} onStartExam={() => setStep(4)} />}
-
-      {
-        console.log("Data:", salesData?.id)
-      }
       {step === 4 && <ExamPage candidates={candidateData} saleId={salesData?.id}/>}
     </div>
   )
