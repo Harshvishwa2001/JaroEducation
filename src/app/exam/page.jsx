@@ -4,12 +4,14 @@ import { AlertCircle, Clock, AlertTriangle } from 'lucide-react';
 import { useRouter, useSearchParams } from 'next/navigation'; // Added useSearchParams
 import { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
+import { connection } from 'next/server'
 
-export default function ExamPage({ candidates, saleId }) {
+export default async function ExamPage({ candidates, saleId }) {
+  await connection();
   const router = useRouter();
   const searchParams = useSearchParams(); // Hook to read URL params
   const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || '/api';
-  
+
   // --- STATE MANAGEMENT ---
   const [step, setStep] = useState('loading');
   const [candidate, setCandidate] = useState(null);
@@ -34,7 +36,7 @@ export default function ExamPage({ candidates, saleId }) {
         try {
           // 1. Decrypt email from URL
           const decodedEmail = atob(emailParam);
-          
+
           // 2. Fetch from Database automatically
           const response = await fetch(`${API_BASE_URL}/candidates?email=${encodeURIComponent(decodedEmail)}`);
           const result = await response.json();
@@ -46,7 +48,7 @@ export default function ExamPage({ candidates, saleId }) {
               router.push('/'); // Redirect away if done
               return;
             }
-            
+
             setCandidate(result.data);
             setStep('info'); // Automatically go to info section with filled data
           } else {
@@ -150,8 +152,8 @@ export default function ExamPage({ candidates, saleId }) {
     if (currentQuestionIndex < questions.length - 1) {
       setCurrentQuestionIndex(currentQuestionIndex + 1);
     } else {
-        // Handle Final Submission Logic Here
-        setStep('result');
+      // Handle Final Submission Logic Here
+      setStep('result');
     }
   };
 
@@ -397,12 +399,12 @@ function QuestionBlock({ number, questionData, selectedOption, onSelect }) {
           const displayValue = typeof opt === 'object' ? opt.option_text : opt;
           return (
             <label key={i} className={`flex items-center gap-4 p-5 border rounded-2xl cursor-pointer transition-all group ${selectedOption === displayValue ? 'border-indigo-600 bg-indigo-50' : 'border-slate-100 hover:border-indigo-400 hover:bg-indigo-50/50'}`}>
-              <input 
-                type="radio" 
-                name={`q-${questionData.id}`} 
-                checked={selectedOption === displayValue} 
-                onChange={() => onSelect(displayValue)} 
-                className="accent-indigo-600 w-5 h-5" 
+              <input
+                type="radio"
+                name={`q-${questionData.id}`}
+                checked={selectedOption === displayValue}
+                onChange={() => onSelect(displayValue)}
+                className="accent-indigo-600 w-5 h-5"
               />
               <span className="text-sm font-bold text-slate-600 group-hover:text-[#151941]">
                 {displayValue}
