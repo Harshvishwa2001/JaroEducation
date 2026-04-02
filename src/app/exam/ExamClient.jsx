@@ -337,7 +337,6 @@ export default function ExamPage({ candidates, email }) {
               <div className="min-h-35 animate-in fade-in slide-in-from-right-8 duration-500" key={currentQuestionIndex}>
                 <QuestionBlock
                   number={currentQuestionIndex + 1}
-                  onChange={() => onSelect(option.id)}
                   questionData={questions[currentQuestionIndex]}
                   selectedOption={selectedAnswers[questions[currentQuestionIndex]?.id]}
                   onSelect={(val) => handleOptionChange(question.id, val)} />
