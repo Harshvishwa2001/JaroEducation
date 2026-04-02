@@ -326,12 +326,36 @@ function ExamPageContent({ candidates, email }) {
             <div>
               <h1 className='p-5 text-slate-800 text-xl font-medium'>Your Evaluation Score</h1>
               <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-12">
-                <StatBox label="Profile Strength: " value="32/40" />
-                <StatBox label="Intent Score: " value="30/40" />
-                <StatBox label="Timing Advantage: " value="15/20" />
-                <StatBox label="Total Score: " value="75/100" color="text-emerald-400" />
+                {/* Dynamic Data Mapping */}
+                <StatBox
+                  label="Questions Solved: "
+                  value={`${examResult?.total_solved || 0}`}
+                />
+                <StatBox
+                  label="Correct Answers: "
+                  value={`${examResult?.total_correct || 0}`}
+                />
+                <StatBox
+                  label="Points Earned: "
+                  value={`${examResult?.total_points_earned || 0}`}
+                />
+                <StatBox
+                  label="Accuracy: "
+                  value={`${examResult?.correct_percentage || 0}%`}
+                  color="text-emerald-600"
+                />
               </div>
             </div>
+
+            {/* Voucher Display (Optional Addition) */}
+            {examResult?.voucher_code && (
+              <div className="mb-6">
+                <p className="text-slate-500 text-xs font-bold uppercase tracking-widest">Your Unique Voucher</p>
+                <div className="inline-block bg-white px-6 py-2 rounded-full border-2 border-dashed border-indigo-200 text-indigo-600 font-mono font-bold mt-2">
+                  {examResult.voucher_code}
+                </div>
+              </div>
+            )}
             <div className='grid grid-cols-2 mb-6'>
               <div>
                 <p className="text-black font-light max-w-md mx-auto">You’ve unlocked your <br /> <span className='font-bold'>Career Acceleration Grant.</span></p>
@@ -348,14 +372,14 @@ function ExamPageContent({ candidates, email }) {
                   <img src="/image/trophy.png" alt="Grant Trophy" className='absolute top-1/2 left-4 md:left-2 -translate-y-1/2 h-24 w-auto z-20 drop-shadow-[0_10px_20px_rgba(0,0,0,0.4)] animate-pulse' style={{ animationDuration: '4s' }} />
                   <div className="absolute right-4 top-10 -translate-y-1/2 z-20 text-right max-w-50 md:max-w-65">
                     <h1 className='text-[#151941] font-bold text-xl md:text-2xl tracking-tighter leading-none mb-2'>Merit Tier Candidate</h1>
-                    <p className='absolute left-1 text-slate-800 font-medium text-left text-sm leading-tight tracking-wider'>You performed better than <br /> <span className='text-red-700 text-lg md:text-xl font-black'>78%</span> of applicants</p>
+                    <p className='absolute left-1 text-slate-800 font-medium text-left text-sm leading-tight tracking-wider'>You performed better than <br /> <span className='text-red-700 text-lg md:text-xl font-black'>{examResult?.correct_percentage}</span> of applicants</p>
                   </div>
                   <div className="absolute top-0 -inset-full h-full w-1/2 z-30 block transform -skew-x-12 bg-linear-to-r from-transparent via-white/30 to-transparent group-hover:animate-shine" />
                 </div>
               </div>
             </div>
             <div className='bg-[#901824] w-full h-20 px-10 rounded-xl flex items-center justify-between'>
-              <img src="/image/time.png" alt="time" className='absolute w-14 animate-spin duration-[3000ms]' />
+              <img src="/image/time.png" alt="time" className='absolute w-14 animate-spin duration-3000' />
               <h1 className='text-xl px-20'>Offer Expires in: </h1>
               <div className="flex items-center gap-2 md:gap-4">
                 <TimerBlock value={String(timeLeft.days).padStart(2, '0')} label="days" />
