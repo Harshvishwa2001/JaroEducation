@@ -393,7 +393,7 @@ function ExamPageContent({ candidates, email }) {
             </div>
             <div className='flex items-center justify-center gap-4 mt-10'>
               <button className='group w-full h-16 bg-linear-to-r from-[#f3d57a] to-[#face49] text-black rounded-2xl font-bold text-xs uppercase tracking-[0.3em] shadow-2xl transition-all hover:-translate-y-1 active:scale-[0.98]'>Claim Grant Now</button>
-              <button onClick={() => router.push('/')} className='group w-full h-16 bg-white text-black rounded-2xl font-bold text-xs uppercase tracking-[0.3em] shadow-2xl transition-all hover:-translate-y-1 active:scale-[0.98]'>Exit the Portal</button>
+              <button onClick={() => setStep(1)} className='group w-full h-16 bg-white text-black rounded-2xl font-bold text-xs uppercase tracking-[0.3em] shadow-2xl transition-all hover:-translate-y-1 active:scale-[0.98]'>Exit the Portal</button>
             </div>
           </div>
         )}
