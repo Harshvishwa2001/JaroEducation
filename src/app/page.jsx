@@ -1,10 +1,10 @@
 'use client'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Suspense, useState } from 'react';
+import { useState } from 'react';
 import toast from 'react-hot-toast';
 import Header from './component/Header';
 import RegisterSucess from './component/RegisterSucess';
-import ExamPage, { ExamLoader } from './exam/page';
+import ExamPage from './exam/page';
 
 export default function Home() {
   const [email, setEmail] = useState('');
@@ -230,7 +230,7 @@ export default function Home() {
 
       {/* Step 3: Success */}
       {step === 3 && <RegisterSucess candidate={candidateData?.name} onStartExam={() => setStep(4)} />}
-      {step === 4 && <ExamPage candidates={candidateData} saleId={salesData?.id} />}  
+      {step === 4 && <ExamPage candidates={candidateData} saleId={salesData?.id} />}
     </div>
   )
 }
