@@ -15,10 +15,10 @@ export function QuestionBlock({ number, questionData, selectedOption, onSelect }
                         <label key={i} className={`flex items-center gap-4 p-5 border rounded-2xl cursor-pointer transition-all group ${selectedOption === displayValue ? 'border-indigo-600 bg-indigo-50' : 'border-slate-100 hover:border-indigo-400 hover:bg-indigo-50/50'}`}>
                             <input
                                 type="radio"
-                                name={`q_${questionData.id}`}
-                                value={option.id}
-                                checked={selectedOption === option.id}
-                                onChange={() => onSelect(option.id)} // ✅ MUST BE option.id
+                                name={`q-${questionData.id}`}
+                                checked={selectedOption === displayValue}
+                                onChange={() => onSelect(displayValue)}
+                                className="accent-indigo-600 w-5 h-5"
                             />
                             <span className="text-sm font-bold text-slate-600 group-hover:text-[#151941]">
                                 {displayValue}

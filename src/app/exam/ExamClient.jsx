@@ -167,15 +167,7 @@ export default function ExamPage({ candidates, email }) {
         question_id: parseInt(questionId),
         selected_option_id: parseInt(selectedAnswers[questionId])
       }));
-
-    const unanswered = questions.filter(
-      (q) => !selectedAnswers[q.id]
-    );
-
-    if (unanswered.length > 0) {
-      toast.error("Please answer all questions before submitting!");
-      return;
-    }
+      
 
     // Validation
     if (answersArray.length < questions.length) {
@@ -337,9 +329,9 @@ export default function ExamPage({ candidates, email }) {
               <div className="min-h-35 animate-in fade-in slide-in-from-right-8 duration-500" key={currentQuestionIndex}>
                 <QuestionBlock
                   number={currentQuestionIndex + 1}
-                  questionData={currentQuestion}
-                  selectedOption={selectedAnswers[currentQuestion?.id]}
-                  onSelect={(val) => handleOptionChange(currentQuestion?.id, val)}
+                  questionData={questions[currentQuestionIndex]}
+                  selectedOption={selectedAnswers[questions[currentQuestionIndex]?.id]}
+                  onSelect={(val) => handleOptionChange(questions[currentQuestionIndex].id, val)}
                 />
               </div>
 
