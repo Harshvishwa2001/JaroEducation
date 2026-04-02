@@ -19,8 +19,11 @@ export default function Home() {
   useEffect(() => {
     // Check if sales data or candidate info already exists
     const savedCandidate = localStorage.getItem('candidate_info');
-    const savedSalesId = localStorage.getItem('sales_id');
-    if (savedCandidate || savedSalesId) {
+    const savedSales = localStorage.getItem('sales_person');
+    if (savedSales || savedCandidate) {
+      if (savedSales) {
+        setSalesData(JSON.parse(savedSales));
+      }
       setStep(2);
     }
   }, []);
