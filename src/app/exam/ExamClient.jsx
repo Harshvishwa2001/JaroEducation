@@ -6,16 +6,29 @@ import { StatBox } from '@/components/ui/StatBox';
 import { TimerBlock } from '@/components/ui/TimerBlock';
 import { TimerSegment } from '@/components/ui/TimerSegment';
 import { AlertCircle, Clock } from 'lucide-react';
-import { useRouter, useSearchParams } from 'next/navigation'; // Added useSearchParams
-import { useEffect, useState } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { useEffect, useState, Suspense } from 'react';
 import toast from 'react-hot-toast';
 
-export default function ExamPage({ candidates, email }) {
+// --- WRAPPER FOR NEXT.JS SUSPENSE ---
+export default function ExamPage(props) {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-[#151941] flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-white"></div>
+      </div>
+    }>
+      <ExamPageContent {...props} />
+    </Suspense>
+  );
+}
+
+// --- ACTUAL COMPONENT LOGIC ---
+function ExamPageContent({ candidates, email }) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || '/api';
 
-  // --- STATE MANAGEMENT ---
   const [step, setStep] = useState('loading');
   const [candidate, setCandidate] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -23,6 +36,7 @@ export default function ExamPage({ candidates, email }) {
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [selectedAnswers, setSelectedAnswers] = useState({});
   const [hasWarned, setHasWarned] = useState(false);
+  const [examResult, setExamResult] = useState(null); // Added state for result
   const [timeLeft, setTimeLeft] = useState({
     days: 3, hours: 23, minutes: 2, seconds: 59
   });
@@ -30,54 +44,39 @@ export default function ExamPage({ candidates, email }) {
   const totalSeconds = (timeLeft.minutes * 60) + timeLeft.seconds;
   const isUrgent = totalSeconds <= 120 && timeLeft.days === 0 && timeLeft.hours === 0;
 
-  // --- NEW: AUTOMATIC DATA FETCHING LOGIC --
   useEffect(() => {
     const autoLoadCandidate = async () => {
       const emailParam = email;
-
       if (emailParam) {
         try {
-          // 1. Decrypt email from URL
           const decodedEmail = atob(emailParam);
-
-          // 2. Fetch from Database automatically
           const response = await fetch(`${API_BASE_URL}/candidates?email=${encodeURIComponent(decodedEmail)}`);
           const result = await response.json();
 
           if (response.ok && result.data) {
-            // Check if already submitted
             if (parseInt(result.data.submitted_at) === 1) {
               toast.error("Exam already completed.");
-              router.push('/'); // Redirect away if done
+              router.push('/');
               return;
             }
-
             setCandidate(result.data);
-            setStep('info'); // Automatically go to info section with filled data
+            setStep('info');
           } else {
-            toast.error("Candidate not found.");
-            setStep('info'); // Fallback to empty info if not found
+            setStep('info');
           }
         } catch (e) {
-          console.error("Link decryption error", e);
           setStep('info');
         }
       } else {
-        // Fallback to your existing props/localStorage logic if no email in URL
         const savedData = localStorage.getItem('candidate_info');
-        if (savedData) {
-          setCandidate(JSON.parse(savedData));
-        } else if (candidates) {
-          setCandidate(candidates);
-        }
+        if (savedData) setCandidate(JSON.parse(savedData));
+        else if (candidates) setCandidate(candidates);
         setStep('info');
       }
     };
-
     autoLoadCandidate();
-  }, [searchParams, candidates, router, API_BASE_URL]);
+  }, [email, candidates, router, API_BASE_URL]);
 
-  // --- TIMER LOGIC ---
   useEffect(() => {
     const timer = setInterval(() => {
       setTimeLeft(prev => {
@@ -101,32 +100,20 @@ export default function ExamPage({ candidates, email }) {
     return () => clearInterval(timer);
   }, []);
 
-  // --- WARNING TOAST ---
   useEffect(() => {
     if (timeLeft.days === 0 && timeLeft.hours === 0 && timeLeft.minutes === 2 && timeLeft.seconds === 0 && !hasWarned) {
-      toast.error("Hurry! Only 2 minutes remaining to complete your assessment.", {
-        duration: 5000,
-        position: 'top-center',
-        style: { background: '#901824', color: '#fff', fontWeight: 'bold', borderRadius: '15px', border: '1px solid #ff4b5c' },
-        icon: '⚠️',
-      });
+      toast.error("Hurry! Only 2 minutes remaining.", { icon: '⚠️' });
       setHasWarned(true);
     }
-  }, [timeLeft.minutes, timeLeft.seconds, hasWarned]);
+  }, [timeLeft, hasWarned]);
 
-  // --- HANDLERS ---
   const handleOptionChange = (questionId, optionValue) => {
     setSelectedAnswers(prev => ({ ...prev, [questionId]: optionValue }));
   };
 
   const handleStartExam = async () => {
-    if (!candidate) {
-      toast.error("Profile data not found. Please try again.");
-      return;
-    }
-
+    if (!candidate) return toast.error("Profile data not found.");
     setLoading(true);
-
     try {
       const response = await fetch(`${API_BASE_URL}/questions`, {
         method: 'POST',
@@ -136,7 +123,6 @@ export default function ExamPage({ candidates, email }) {
           level: candidate.level || candidate.course_name || 'General'
         })
       });
-
       const result = await response.json();
       if (response.ok && result.data) {
         setQuestions(result.data);
@@ -145,7 +131,7 @@ export default function ExamPage({ candidates, email }) {
         toast.error(result.message || 'Failed to load questions.');
       }
     } catch (err) {
-      toast.error("Network error. Please check your connection.");
+      toast.error("Network error.");
     } finally {
       setLoading(false);
     }
@@ -160,60 +146,40 @@ export default function ExamPage({ candidates, email }) {
   };
 
   const handleSubmitQuiz = async () => {
-    // Convert selectedAnswers → API format
-    const answersArray = Object.keys(selectedAnswers)
-      .filter((questionId) => selectedAnswers[questionId] !== undefined)
-      .map((questionId) => ({
-        question_id: parseInt(questionId),
-        selected_option_id: parseInt(selectedAnswers[questionId])
-      }));
-      
+    const answersArray = Object.keys(selectedAnswers).map((qId) => ({
+      question_id: parseInt(qId),
+      selected_option_id: parseInt(selectedAnswers[qId])
+    }));
 
-    // Validation
     if (answersArray.length < questions.length) {
-      toast.error("Please answer all questions before submitting!");
-      return;
+      return toast.error("Please answer all questions before submitting!");
     }
 
     try {
       setLoading(true);
-
-      const payload = {
-        candidate_id: candidate?.id || candidate?.sales_id,
-        answers: answersArray
-      };
-
       const response = await fetch(`${API_BASE_URL}/submit-answers`, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify(payload)
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          candidate_id: candidate?.id || candidate?.sales_id,
+          answers: answersArray
+        })
       });
 
       const result = await response.json();
-
       if (response.ok) {
-        // ✅ Handle result
-        console.log("Result:", result);
-
-        // OPTIONAL: store result in state if needed
-        setResult(result.data);
-
+        setExamResult(result.data); // Correctly setting results
         setStep("result");
       } else {
         toast.error(result.message || "Failed to submit exam");
       }
-
     } catch (err) {
-      console.error(err);
-      toast.error("Network error occurred during submission.");
+      toast.error("Network error during submission.");
     } finally {
       setLoading(false);
     }
   };
 
-  // --- LOADING RENDER ---
   if (step === 'loading') {
     return (
       <div className="min-h-screen bg-[#151941] flex items-center justify-center">
@@ -222,7 +188,6 @@ export default function ExamPage({ candidates, email }) {
     );
   }
 
-  // --- MAIN UI RENDER (UNCHANGED DESIGN) ---
   return (
     <div className='bg-linear-to-b from-[#474f83] to-[#151941] min-h-screen text-white pb-20'>
       {isUrgent && step === 'quiz' && (
@@ -345,9 +310,10 @@ export default function ExamPage({ candidates, email }) {
                 </button>
                 <button
                   onClick={handleNext}
+                  disabled={loading}
                   className="w-full md:w-auto px-12 h-14 bg-linear-to-r from-[#f3d57a] to-[#face49] text-black rounded-xl font-bold tracking-widest shadow-xl transition-all flex items-center justify-center gap-3 active:scale-95"
                 >
-                  {currentQuestionIndex === questions.length - 1 ? 'Submit' : 'Next'}
+                  {loading ? 'Submitting...' : currentQuestionIndex === questions.length - 1 ? 'Submit' : 'Next'}
                 </button>
               </div>
             </div>
@@ -409,8 +375,5 @@ export default function ExamPage({ candidates, email }) {
         )}
       </div>
     </div>
-  )
+  );
 }
-
-
-
