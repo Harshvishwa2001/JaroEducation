@@ -13,6 +13,7 @@ export default function Home() {
   const [levelCategory, setLevelCategory] = useState(''); // Added for Shadcn Select
   const [isLoading, setIsLoading] = useState(false);
   const [candidateData, setCandidateData] = useState(null); // Store all data for the exam
+  const today = new Date().toISOString().split('T')[0];
 
   const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
@@ -111,6 +112,17 @@ export default function Home() {
   };
 
   console.log("salesData", salesData?.id)
+
+  const handleDateChange = (e) => {
+    const selectedDate = e.target.value;
+    const today = new Date().toISOString().split('T')[0];
+
+    if (selectedDate < today) {
+      toast.error("Please select a current or future date");
+      e.target.value = ""; // Reset the field
+      return;
+    }
+  };
 
   return (
     <div className=''>
@@ -221,11 +233,11 @@ export default function Home() {
                     </div>
                     <div className="space-y-2">
                       <label className="text-[11px] font-black text-slate-400 uppercase tracking-widest ml-1">Date of Scholarship</label>
-                      <input name="date_scholarship" type="date" className="w-full h-14 px-6 bg-slate-50/50 border border-slate-100 rounded-2xl text-sm font-semibold text-black outline-none uppercase" required />
+                      <input name="date_scholarship" type="date" className="w-full h-14 px-6 bg-slate-50/50 border border-slate-100 rounded-2xl text-sm font-semibold text-black outline-none uppercase" onChange={handleDateChange} min={today} required />
                     </div>
                     <div className="space-y-2">
                       <label className="text-[11px] font-black text-slate-400 uppercase tracking-widest ml-1">Expected Completion Date</label>
-                      <input name="date_completion" type="date" className="w-full h-14 px-6 bg-slate-50/50 border border-slate-100 rounded-2xl text-sm font-semibold text-black outline-none uppercase" required />
+                      <input name="date_completion" type="date" className="w-full h-14 px-6 bg-slate-50/50 border border-slate-100 rounded-2xl text-sm font-semibold text-black outline-none uppercase" onChange={handleDateChange} min={today + 1} required />
                     </div>
                   </div>
                   <div className="pt-6 flex justify-end">
