@@ -2,8 +2,7 @@
 import { CheckCircle2 } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 
-export default function RegisterSuccess({ candidate }) {
-    const router = useRouter();
+export default function RegisterSuccess({ candidate, setStep }) {
 
     return (
         <div className='bg-linear-to-b from-[#474f83] to-[#151941] min-h-screen'>
@@ -32,7 +31,7 @@ export default function RegisterSuccess({ candidate }) {
                         {/* Call to Action */}
                         <div className='flex items-center justify-center gap-4'>
                             <button
-                                onClick={() => router.push('/')}
+                                onClick={() => setStep(2)}
                                 className='group w-full h-16 bg-white text-black rounded-2xl font-bold text-xs uppercase tracking-[0.3em] shadow-2xl shadow-indigo-900/40 transition-all hover:opacity-95 hover:-translate-y-1 active:scale-[0.98] flex items-center justify-center gap-3'>
                                 Exit the Portal
                             </button>
