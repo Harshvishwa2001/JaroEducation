@@ -2,12 +2,12 @@
 
 import { AlertCircle, Clock } from 'lucide-react';
 import { useRouter, useSearchParams } from 'next/navigation'; // Added useSearchParams
-import { Suspense, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 
 export default function ExamPage({ candidates, saleId }) {
   const router = useRouter();
-  const searchParams = useSearchParams(); // Hook to read URL params
+  const searchParams = useSearchParams(); 
   const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || '/api';
 
   // --- STATE MANAGEMENT ---
@@ -166,7 +166,6 @@ export default function ExamPage({ candidates, saleId }) {
 
   // --- MAIN UI RENDER (UNCHANGED DESIGN) ---
   return (
-    <Suspense fallback={<ExamLoader />}>
       <div className='bg-linear-to-b from-[#474f83] to-[#151941] min-h-screen text-white pb-20'>
         {isUrgent && step === 'quiz' && (
           <div className="fixed top-10 left-1/2 -translate-x-1/2 z-[100] animate-in slide-in-from-top-10 duration-500">
@@ -352,7 +351,6 @@ export default function ExamPage({ candidates, saleId }) {
           )}
         </div>
       </div>
-    </Suspense>
   )
 }
 
