@@ -179,7 +179,7 @@ export default function Home() {
                   <div className="flex items-center gap-3 bg-[#f8fafc] px-5 py-3 rounded-2xl border border-slate-100 shadow-sm">
                     <div className="h-2 w-2 bg-emerald-500 rounded-full animate-pulse" />
                     <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Sales Employees:</span>
-                    <span className="text-sm font-bold text-black">{salesData?.name || "Harsh Vishwakarma"}</span>
+                    <span className="text-sm font-bold text-black">{salesData?.name || "Harsh Vishwakarma"} : {salesData?.email}</span>
                   </div>
                 </div>
 
