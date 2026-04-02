@@ -236,7 +236,7 @@ function ExamPageContent({ candidates, email }) {
                 <InfoBox label="Registered Email" value={candidate?.email || '...'} />
                 <InfoBox label="Contact Number" value={candidate?.mobile || '...'} />
                 <InfoBox label="University" value={`${candidate?.course_name || '...'} - ${candidate?.university || '...'}`} />
-                <InfoBox label="Course Level:" value={candidate?.level || candidate?.course_name || 'MBA'} highlight />
+                <InfoBox label="Course Level:" value={candidate?.level || 'MBA'} highlight />
               </div>
 
               <div className="text-center pt-4">
