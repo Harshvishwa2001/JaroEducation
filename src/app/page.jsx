@@ -4,7 +4,7 @@ import { useState } from 'react';
 import toast from 'react-hot-toast';
 import Header from './component/Header';
 import RegisterSucess from './component/RegisterSucess';
-import ExamPage from './exam/page';
+import ExamPage from './exam/ExamClient';
 
 export default function Home() {
   const [email, setEmail] = useState('');
