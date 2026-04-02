@@ -1,5 +1,10 @@
 "use client"
 
+import { InfoBox } from '@/components/ui/InfoBox';
+import { QuestionBlock } from '@/components/ui/QuestionBlock';
+import { StatBox } from '@/components/ui/StatBox';
+import { TimerBlock } from '@/components/ui/TimerBlock';
+import { TimerSegment } from '@/components/ui/TimerSegment';
 import { AlertCircle, Clock } from 'lucide-react';
 import { useRouter, useSearchParams } from 'next/navigation'; // Added useSearchParams
 import { useEffect, useState } from 'react';
@@ -150,8 +155,58 @@ export default function ExamPage({ candidates, email }) {
     if (currentQuestionIndex < questions.length - 1) {
       setCurrentQuestionIndex(currentQuestionIndex + 1);
     } else {
-      // Handle Final Submission Logic Here
-      setStep('result');
+      await handleSubmitQuiz();
+    }
+  };
+
+  const handleSubmitQuiz = async () => {
+    // Convert selectedAnswers → API format
+    const answersArray = Object.keys(selectedAnswers).map((questionId) => ({
+      question_id: parseInt(questionId),
+      selected_option_id: parseInt(selectedAnswers[questionId])
+    }));
+
+    // Validation
+    if (answersArray.length < questions.length) {
+      toast.error("Please answer all questions before submitting!");
+      return;
+    }
+
+    try {
+      setLoading(true);
+
+      const payload = {
+        candidate_id: candidate?.id || candidate?.sales_id,
+        answers: answersArray
+      };
+
+      const response = await fetch(`${API_BASE_URL}/submit-answers`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(payload)
+      });
+
+      const result = await response.json();
+
+      if (response.ok) {
+        // ✅ Handle result
+        console.log("Result:", result);
+
+        // OPTIONAL: store result in state if needed
+        setResult(result.data);
+
+        setStep("result");
+      } else {
+        toast.error(result.message || "Failed to submit exam");
+      }
+
+    } catch (err) {
+      console.error(err);
+      toast.error("Network error occurred during submission.");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -354,80 +409,5 @@ export default function ExamPage({ candidates, email }) {
   )
 }
 
-// --- HELPER COMPONENTS (NO CHANGES) ---
-function TimerSegment({ value, label, isUrgent }) {
-  return (
-    <div className="flex flex-col items-center min-w-8">
-      <span className={`text-2xl font-mono font-black tabular-nums transition-colors ${isUrgent ? 'text-red-500' : 'text-white'}`}>{value}</span>
-      <span className={`text-[8px] font-bold uppercase tracking-widest ${isUrgent ? 'text-red-400' : 'text-indigo-200'}`}>{label}</span>
-    </div>
-  );
-}
 
-export function ExamLoader() {
-  return (
-    <div className="min-h-screen bg-[#151941] flex items-center justify-center">
-      <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-white"></div>
-    </div>
-  );
-}
 
-function TimerBlock({ value, label }) {
-  return (
-    <div className="flex flex-col items-center">
-      <span className="text-white text-3xl md:text-4xl font-bold leading-none">{value}</span>
-      <span className="text-white/90 text-[10px] md:text-xs font-normal mt-1">{label}</span>
-    </div>
-  );
-}
-
-function InfoBox({ label, value, highlight }) {
-  return (
-    <div className={`p-5 rounded-2xl border transition-all ${highlight ? 'bg-indigo-50 border-indigo-200' : 'bg-slate-50 border-slate-100 hover:bg-white hover:shadow-lg'}`}>
-      <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest block mb-2">{label}</span>
-      <span className={`text-sm font-bold ${highlight ? 'text-indigo-600' : 'text-[#151941]'}`}>{value}</span>
-    </div>
-  )
-}
-
-function QuestionBlock({ number, questionData, selectedOption, onSelect }) {
-  if (!questionData) return null;
-  const options = questionData.options || [];
-
-  return (
-    <div className="space-y-6">
-      <h4 className="font-bold text-[#151941] text-xl flex gap-4 leading-tight">
-        <span className="text-indigo-600 opacity-30 font-black">{String(number).padStart(2, '0')}</span>
-        {questionData.text || questionData.question}
-      </h4>
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 ml-0 md:ml-12">
-        {options.map((opt, i) => {
-          const displayValue = typeof opt === 'object' ? opt.option_text : opt;
-          return (
-            <label key={i} className={`flex items-center gap-4 p-5 border rounded-2xl cursor-pointer transition-all group ${selectedOption === displayValue ? 'border-indigo-600 bg-indigo-50' : 'border-slate-100 hover:border-indigo-400 hover:bg-indigo-50/50'}`}>
-              <input
-                type="radio"
-                name={`q-${questionData.id}`}
-                checked={selectedOption === displayValue}
-                onChange={() => onSelect(displayValue)}
-                className="accent-indigo-600 w-5 h-5"
-              />
-              <span className="text-sm font-bold text-slate-600 group-hover:text-[#151941]">
-                {displayValue}
-              </span>
-            </label>
-          )
-        })}
-      </div>
-    </div>
-  );
-}
-
-function StatBox({ label, value, color = "text-white" }) {
-  return (
-    <div className="bg-slate-800 rounded-3xl p-6 border border-white/10 backdrop-blur-sm">
-      <h4 className={`text-3xl font-black mb-1 ${color}`}>{value}</h4>
-      <span className="text-[10px] font-black text-indigo-200/50 uppercase tracking-widest">{label}</span>
-    </div>
-  )
-}

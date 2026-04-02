@@ -1,6 +1,6 @@
 'use client'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import Header from './component/Header';
 import RegisterSucess from './component/RegisterSucess';
@@ -15,6 +15,15 @@ export default function Home() {
   const [candidateData, setCandidateData] = useState(null); // Store all data for the exam
 
   const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
+
+  useEffect(() => {
+    // Check if sales data or candidate info already exists
+    const savedCandidate = localStorage.getItem('candidate_info');
+    const savedSalesId = localStorage.getItem('sales_id');
+    if (savedCandidate || savedSalesId) {
+      setStep(2);
+    }
+  }, []);
 
   const onSubmit = async (e) => {
     e.preventDefault()
