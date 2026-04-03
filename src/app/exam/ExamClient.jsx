@@ -215,7 +215,7 @@ function ExamPageContent({ candidates, email }) {
                   <img src="/image/SEO 2.gif" alt="Rocket Icon" className='w-24 h-24 md:w-40 md:h-40 object-cover' />
                 </div>
                 <div>
-                  <h1 className="text-3xl md:text-5xl font-black leading-tight md:leading-[0.6] tracking-wide bg-linear-to-b from-[#ffffff] to-[#6d79c5] bg-clip-text text-transparent md:mt-16">
+                  <h1 className="text-3xl md:text-5xl font-bold leading-tight md:leading-[0.6] tracking-wide bg-linear-to-b from-[#ffffff] to-[#6d79c5] bg-clip-text text-transparent md:mt-16">
                     Udaan <br />
                     <span className='text-xl md:text-3xl'>Kamyabi ki</span>
                   </h1>
@@ -228,7 +228,7 @@ function ExamPageContent({ candidates, email }) {
 
             <div className="animate-in fade-in zoom-in-95 duration-500 bg-white rounded-[30px] md:rounded-[40px] p-6 md:p-14 shadow-2xl text-slate-800 border border-white/20">
               <div className="text-center mb-8 md:mb-10">
-                <h3 className="text-2xl md:text-4xl font-black text-[#151941] uppercase italic tracking-wide leading-tight md:leading-none">
+                <h3 className="text-2xl md:text-4xl font-bold text-[#151941] uppercase italic tracking-wide leading-tight md:leading-none">
                   Welcome, {candidate?.name || 'Candidate'}!
                 </h3>
                 <p className="text-slate-400 font-bold mt-3 md:mt-4 text-[10px] md:text-xs uppercase tracking-[0.2em] md:tracking-[0.3em]">Verify your profile details</p>
@@ -258,12 +258,12 @@ function ExamPageContent({ candidates, email }) {
         {step === 'quiz' && (
           <div className="space-y-6">
             <div className='flex flex-col md:flex-row items-center justify-between gap-4 md:gap-0'>
-              <h1 className="text-3xl md:text-5xl font-black leading-tight md:leading-[0.6] tracking-wide bg-linear-to-b from-[#ffffff] to-[#6d79c5] bg-clip-text text-transparent md:px-10 py-2 md:py-4 text-center md:text-left">
+              <h1 className="text-3xl md:text-5xl font-bold leading-tight md:leading-[0.6] tracking-wide bg-linear-to-b from-[#ffffff] to-[#6d79c5] bg-clip-text text-transparent md:px-10 py-2 md:py-4 text-center md:text-left">
                 Udaan <br />
                 <span className='text-xl md:text-3xl'>Kamyabi ki</span>
               </h1>
               <div className="flex items-center gap-3 md:pr-10">
-                <span className={`text-[10px] md:text-[12px] font-black uppercase tracking-widest transition-colors duration-500 ${isUrgent ? 'text-red-500 animate-pulse' : 'text-white/80'}`}>
+                <span className={`text-[10px] md:text-[12px] font-bold uppercase tracking-widest transition-colors duration-500 ${isUrgent ? 'text-red-500 animate-pulse' : 'text-white/80'}`}>
                   {isUrgent ? 'Hurry!' : 'Time Left :'}
                 </span>
                 <div className={`flex items-center gap-2 md:gap-3 px-3 md:px-5 py-2 rounded-2xl border backdrop-blur-md transition-all duration-500 ${isUrgent ? 'bg-red-500/10 border-red-500/50 shadow-[0_0_15px_rgba(239,68,68,0.2)]' : 'bg-white/10 border-white/10'}`}>
@@ -286,7 +286,7 @@ function ExamPageContent({ candidates, email }) {
                   </div>
                 </div>
                 <div className="w-full md:w-auto text-right border-t md:border-t-0 pt-2 md:pt-0">
-                  <p className="text-lg md:text-xl font-black text-indigo-600">{currentQuestionIndex + 1} <span className="text-slate-300 text-sm">/ {questions.length}</span></p>
+                  <p className="text-lg md:text-xl font-bold text-indigo-600">{currentQuestionIndex + 1} <span className="text-slate-300 text-sm">/ {questions.length}</span></p>
                 </div>
               </div>
 
@@ -354,8 +354,8 @@ function ExamPageContent({ candidates, email }) {
               </div>
               <div className="flex flex-col items-center space-y-4">
                 <div className="text-center space-y-1">
-                  <p className='text-slate-700 font-semibold text-xs md:text-sm'>Valid for <span className='text-red-600 font-black italic'>72 hours</span> only</p>
-                  <p className='text-slate-700 font-semibold text-xs md:text-sm'>Top <span className='text-red-600 font-black italic'>100</span> Candidate Selection</p>
+                  <p className='text-slate-700 font-semibold text-xs md:text-sm'>Valid for <span className='text-red-600 font-bold italic'>72 hours</span> only</p>
+                  <p className='text-slate-700 font-semibold text-xs md:text-sm'>Top <span className='text-red-600 font-bold italic'>100</span> Candidate Selection</p>
                 </div>
                 {/* Responsive Golden Card */}
                 <div className="relative group w-full max-w-[340px] h-[120px] md:h-30 overflow-hidden rounded-[24px] shadow-2xl border-4 border-[#bf9b30] shrink-0">
@@ -364,7 +364,7 @@ function ExamPageContent({ candidates, email }) {
                   <img src="/image/trophy.png" alt="Grant Trophy" className='absolute top-1/2 left-2 md:left-2 -translate-y-1/2 h-16 md:h-24 w-auto z-20 drop-shadow-[0_10px_20px_rgba(0,0,0,0.4)] animate-pulse' />
                   <div className="absolute right-2 md:right-4 top-1/2 -translate-y-1/2 z-20 text-right w-[60%] md:w-auto">
                     <h1 className='text-[#151941] font-bold text-sm md:text-xl tracking-tighter leading-none mb-1 md:mb-2'>Merit Tier Candidate</h1>
-                    <p className='text-slate-800 font-medium text-[10px] md:text-sm leading-tight tracking-tight'>Performed better than <br /> <span className='text-red-700 text-sm md:text-xl font-black'>{examResult?.correct_percentage}%</span> applicants</p>
+                    <p className='text-slate-800 font-medium text-[10px] md:text-sm leading-tight tracking-tight'>Performed better than <br /> <span className='text-red-700 text-sm md:text-xl font-bold'>{examResult?.correct_percentage}%</span> applicants</p>
                   </div>
                   <div className="absolute top-0 -inset-full h-full w-1/2 z-30 block transform -skew-x-12 bg-linear-to-r from-transparent via-white/30 to-transparent group-hover:animate-shine" />
                 </div>
@@ -377,11 +377,11 @@ function ExamPageContent({ candidates, email }) {
               <h1 className='text-sm md:text-xl md:px-20'>Offer Expires in: </h1>
               <div className="flex items-center gap-2 md:gap-4">
                 <TimerBlock value={String(timeLeft.days).padStart(2, '0')} label="days" />
-                <span className="text-white/50 text-base md:text-xl font-black mb-3 md:mb-5">:</span>
+                <span className="text-white/50 text-base md:text-xl font-bold mb-3 md:mb-5">:</span>
                 <TimerBlock value={String(timeLeft.hours).padStart(2, '0')} label="hrs" />
-                <span className="text-white/50 text-base md:text-xl font-black mb-3 md:mb-5">:</span>
+                <span className="text-white/50 text-base md:text-xl font-bold mb-3 md:mb-5">:</span>
                 <TimerBlock value={String(timeLeft.minutes).padStart(2, '0')} label="min" />
-                <span className="text-white/50 text-base md:text-xl font-black mb-3 md:mb-5">:</span>
+                <span className="text-white/50 text-base md:text-xl font-bold mb-3 md:mb-5">:</span>
                 <TimerBlock value={String(timeLeft.seconds).padStart(2, '0')} label="sec" />
               </div>
             </div>

@@ -7,7 +7,7 @@ export function QuestionBlock({ number, questionData, selectedOption, onSelect }
     return (
         <div className="space-y-6">
             <h4 className="font-bold text-[#151941] text-xl flex gap-4 leading-tight">
-                <span className="text-indigo-600 opacity-30 font-black">
+                <span className="text-indigo-600 opacity-30 font-bold">
                     {String(number).padStart(2, '0')}
                 </span>
                 {questionData.text || questionData.question}

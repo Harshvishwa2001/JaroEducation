@@ -138,7 +138,7 @@ export default function Home() {
                 <img src="/image/SEO 2.gif" alt="SEO 2" className="relative w-50 md:w-60 drop-shadow-2xl" />
               </div>
               <div className="relative -top-10">
-                <h1 className="text-6xl md:text-8xl font-black leading-[0.6] tracking-wide bg-linear-to-b from-[#ffffff] to-[#6d79c5] bg-clip-text text-transparent">
+                <h1 className="text-6xl md:text-8xl font-bold leading-[0.6] tracking-wide bg-linear-to-b from-[#ffffff] to-[#6d79c5] bg-clip-text text-transparent">
                   Udaan <br />
                   <span className='text-5xl md:text-6xl'>Kamyabi ki</span>
                 </h1>
@@ -185,12 +185,12 @@ export default function Home() {
               <div className="p-8 md:p-12 ">
                 <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-10 gap-4 border-b border-slate-400 pb-8">
                   <div className="space-y-1">
-                    <h3 className="text-3xl font-black text-black tracking-tighter uppercase italic">Candidate Registration</h3>
+                    <h3 className="text-3xl font-bold text-black tracking-tighter uppercase italic">Candidate Registration</h3>
                     <p className="text-xs font-bold text-slate-400 uppercase tracking-[0.2em]">Fill in details to begin assessment</p>
                   </div>
                   <div className="flex items-center gap-3 bg-[#f8fafc] px-5 py-3 rounded-2xl border border-slate-100 shadow-sm">
                     <div className="h-2 w-2 bg-emerald-500 rounded-full animate-pulse" />
-                    <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Sales Employees:</span>
+                    <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Sales Employees:</span>
                     <span className="text-sm font-bold text-black">{salesData?.name || "Harsh Vishwakarma"} : {salesData?.email}</span>
                   </div>
                 </div>
@@ -198,19 +198,19 @@ export default function Home() {
                 <form onSubmit={onRegisterSubmit} className="space-y-8">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-x-10 gap-y-6">
                     <div className="space-y-2">
-                      <label className="text-[11px] font-black text-slate-400 uppercase tracking-widest ml-1">Full Name</label>
+                      <label className="text-[11px] font-bold text-slate-400 uppercase tracking-widest ml-1">Full Name</label>
                       <input name="name" type="text" className="w-full h-14 px-6 bg-slate-50/50 border border-slate-100 rounded-2xl text-sm font-semibold text-black focus:ring-4 focus:ring-indigo-500/10 focus:border-[#474f83] outline-none transition-all" placeholder="John Doe" required />
                     </div>
                     <div className="space-y-2">
-                      <label className="text-[11px] font-black text-slate-400 uppercase tracking-widest ml-1">Email Address</label>
+                      <label className="text-[11px] font-bold text-slate-400 uppercase tracking-widest ml-1">Email Address</label>
                       <input name="email" type="email" className="w-full h-14 px-6 bg-slate-50/50 border border-slate-100 rounded-2xl text-sm font-semibold text-black focus:ring-4 focus:ring-indigo-500/10 focus:border-[#474f83] outline-none transition-all" placeholder="admin@gmail.com" required />
                     </div>
                     <div className="space-y-2">
-                      <label className="text-[11px] font-black text-slate-400 uppercase tracking-widest ml-1">Mobile Number</label>
+                      <label className="text-[11px] font-bold text-slate-400 uppercase tracking-widest ml-1">Mobile Number</label>
                       <input name="mobile" type="tel" className="w-full h-14 px-6 bg-slate-50/50 border border-slate-100 rounded-2xl text-sm font-semibold text-black focus:ring-4 focus:ring-indigo-500/10 focus:border-[#474f83] outline-none transition-all" placeholder="10-digit number" pattern="[0-9]{10}" required />
                     </div>
                     <div className="relative group w-full">
-                      <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-2 mb-2 block">Level Category</label>
+                      <label className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em] ml-2 mb-2 block">Level Category</label>
                       <Select onValueChange={setLevelCategory} required>
                         <SelectTrigger className="w-full h-14 px-6 bg-slate-50/50 border border-slate-200 rounded-2xl text-sm font-bold text-black focus:border-[#474f83] border-solid">
                           <SelectValue placeholder="Select Level..." />
@@ -224,19 +224,19 @@ export default function Home() {
                       </Select>
                     </div>
                     <div className="space-y-2">
-                      <label className="text-[11px] font-black text-slate-400 uppercase tracking-widest ml-1">University</label>
+                      <label className="text-[11px] font-bold text-slate-400 uppercase tracking-widest ml-1">University</label>
                       <input name="university" type="text" className="w-full h-14 px-6 bg-slate-50/50 border border-slate-100 rounded-2xl text-sm font-semibold text-black focus:ring-4 focus:ring-indigo-500/10 focus:border-[#474f83] outline-none transition-all" placeholder="University Name" required />
                     </div>
                     <div className="space-y-2">
-                      <label className="text-[11px] font-black text-slate-400 uppercase tracking-widest ml-1">Course Name</label>
+                      <label className="text-[11px] font-bold text-slate-400 uppercase tracking-widest ml-1">Course Name</label>
                       <input name="course_name" type="text" className="w-full h-14 px-6 bg-slate-50/50 border border-slate-100 rounded-2xl text-sm font-semibold text-black focus:ring-4 focus:ring-indigo-500/10 focus:border-[#474f83] outline-none transition-all" placeholder="Course Name" required />
                     </div>
                     <div className="space-y-2">
-                      <label className="text-[11px] font-black text-slate-400 uppercase tracking-widest ml-1">Date of Scholarship</label>
+                      <label className="text-[11px] font-bold text-slate-400 uppercase tracking-widest ml-1">Date of Scholarship</label>
                       <input name="date_scholarship" type="date" className="w-full h-14 px-6 bg-slate-50/50 border border-slate-100 rounded-2xl text-sm font-semibold text-black outline-none uppercase" onChange={handleDateChange} min={today} required />
                     </div>
                     <div className="space-y-2">
-                      <label className="text-[11px] font-black text-slate-400 uppercase tracking-widest ml-1">Expected Completion Date</label>
+                      <label className="text-[11px] font-bold text-slate-400 uppercase tracking-widest ml-1">Expected Completion Date</label>
                       <input name="date_completion" type="date" className="w-full h-14 px-6 bg-slate-50/50 border border-slate-100 rounded-2xl text-sm font-semibold text-black outline-none uppercase" onChange={handleDateChange} min={today + 1} required />
                     </div>
                   </div>
